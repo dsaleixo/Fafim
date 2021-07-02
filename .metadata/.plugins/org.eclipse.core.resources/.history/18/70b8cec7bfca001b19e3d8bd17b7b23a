@@ -1,0 +1,28 @@
+package CFGBUS;
+
+import CFG.S;
+import util.Pair;
+
+public class BottomUp_Search {
+
+	public BottomUp_Search() {
+		// TODO Auto-generated constructor stub
+	}
+
+	void init() {
+		
+	}
+	
+	
+	public Pair<S, S> run(){
+		
+		return null;
+	}
+	
+	
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+	}
+
+}

@@ -1,0 +1,23 @@
+package Tests;
+
+import CLG_David.Attack;
+import CLG_David.Direction;
+import CLG_David.N;
+import CLG_David.OpponentPolicy;
+import CLG_David.Type;
+
+public class PrintWord {
+
+	public PrintWord() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Attack a= new Attack(new Type("worker"),new OpponentPolicy("Closest"));
+		System.out.println(a.translate());
+		Train t= new Train( new N("100"), new Type("worker") , new  Direction("EnemyDir"));
+
+	}
+
+}

@@ -1,0 +1,9 @@
+package CFGBUS;
+
+public class PCFG {
+
+	public PCFG() {
+		// TODO Auto-generated constructor stub
+	}
+
+}

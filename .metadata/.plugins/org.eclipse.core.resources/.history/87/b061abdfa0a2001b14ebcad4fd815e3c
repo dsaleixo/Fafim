@@ -1,0 +1,29 @@
+package principal;
+
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.List;
+import java.util.Scanner;
+
+import ai.synthesis.grammar.dslTree.interfacesDSL.iDSL;
+
+public class GuerraDosMelhores {
+	List<iDSL> jogadores;
+	List<Double> tempos;
+	
+	public static void ler() throws FileNotFoundException {
+		Scanner in = new Scanner(new FileReader("rrr/.txt"));
+		while (in.hasNextLine()) {
+		    String line = in.nextLine();
+		    System.out.println(line);
+		}
+	}
+	
+	
+	
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+	}
+
+}

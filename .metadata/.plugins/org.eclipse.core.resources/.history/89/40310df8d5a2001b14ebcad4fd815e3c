@@ -1,0 +1,48 @@
+package principal;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.List;
+import java.util.Scanner;
+
+import ai.synthesis.grammar.dslTree.interfacesDSL.iDSL;
+import ai.synthesis.twophasessa.TradutorDSL;
+
+public class GuerraDosMelhores {
+	static List<iDSL> jogadores;
+	static List<Double> tempos;
+	
+	public static void ler() throws IOException {
+		BufferedReader buffRead = new BufferedReader(new FileReader("./rrr/log_0_0_0.txt"));
+		String linha = "";
+		linha = buffRead.readLine();
+		while (true) {
+			if (linha != null) {
+				String dados[] = linha.split(";");
+				if (dados[0].equals("Camp")){
+					double d = Double.parseDouble(dados[2].replace(",", "."));
+					TradutorDSL trad = new TradutorDSL(dados[1]);
+					iDSL j = trad.getAST();
+					jogadores.add(j);
+					tempos.add(d);
+					
+				}
+			} else
+				break;
+			linha = buffRead.readLine();
+		}
+		buffRead.close();
+	}
+	
+	
+	
+	public static void main(String[] args) throws IOException {
+		// TODO Auto-generated method stub
+		System.out.println("fdf");
+		ler();
+		System.out.println("fddffff");
+	}
+
+}

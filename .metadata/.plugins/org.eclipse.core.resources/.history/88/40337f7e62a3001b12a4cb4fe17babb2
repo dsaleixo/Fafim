@@ -1,0 +1,47 @@
+package principal;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import ai.synthesis.grammar.dslTree.interfacesDSL.iDSL;
+import ai.synthesis.twophasessa.TradutorDSL;
+import rts.units.UnitTypeTable;
+
+public class AvaliaScripts {
+	static String path_map = "";
+	static int id_map=0;
+	static UnitTypeTable utt;
+	static String a = "";
+	static String b = "";
+	static String c = "";
+	
+	public static void ler() throws IOException {
+		
+		BufferedReader buffRead = new BufferedReader(new FileReader("./Melhores/log_"+a+"_"+b+"_"+c+".txt"));
+		String linha = "";
+		linha = buffRead.readLine();
+		while (true) {
+			if (linha != null) {
+				String dados[] = linha.split(";");
+				if (dados[0].equals("Camp")){
+					double d = Double.parseDouble(dados[2].replace(",", "."));
+					TradutorDSL trad = new TradutorDSL(dados[1]);
+					iDSL j = trad.getAST();
+				
+					
+				}
+			} else
+				break;
+			linha = buffRead.readLine();
+		}
+		buffRead.close();
+	}
+	
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+	}
+
+}

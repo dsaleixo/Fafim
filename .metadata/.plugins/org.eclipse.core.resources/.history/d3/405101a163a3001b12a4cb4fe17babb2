@@ -1,0 +1,85 @@
+package principal;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import ai.synthesis.grammar.dslTree.interfacesDSL.iDSL;
+import ai.synthesis.twophasessa.TradutorDSL;
+import rts.units.UnitTypeTable;
+
+public class AvaliaScripts {
+	static String path_map = "";
+	static int id_map=0;
+	static UnitTypeTable utt;
+	static String a = "";
+	static String b = "";
+	static String c = "";
+	
+	public static void define_map(String i) {
+		if(i.equals( "0")) {
+		
+			path_map = "./maps/mapadavid2.xml";
+			id_map=0;
+		}
+		if(i.equals( "1")) {
+			
+			path_map = "./maps/8x8/basesWorkers8x8A.xml";
+			id_map=1;
+			
+		}
+		if(i.equals("3")) {
+		
+			path_map = "./maps/NoWhereToRun9x8.xml";
+			id_map=3;
+		}
+		if(i.equals( "2")) {
+			
+			path_map = "./maps/24x24/basesWorkers24x24A.xml";
+			id_map=2;
+			
+		}
+		if(i.equals( "4")) {
+		
+			path_map = "./maps/DoubleGame24x24.xml";
+			id_map=4;
+		
+		}
+	}
+	
+	public static void ler() throws IOException {
+		
+		BufferedReader buffRead = new BufferedReader(new FileReader("./Camp/out_"+a+"_"+b+"_"+c+".txt"));
+		String linha = "";
+		linha = buffRead.readLine();
+		while (true) {
+			if (linha != null) {
+				String dados[] = linha.split(";");
+				String dados0[] = dados[0].split(" ");
+				System.out.println(dados0[0]);
+				if(dados0[0]=="Camp") {
+					TradutorDSL trad = new TradutorDSL(dados[1]);
+					iDSL j = trad.getAST();
+					System.out.println(linha);
+				}
+				
+			} else
+				break;
+			linha = buffRead.readLine();
+		}
+		buffRead.close();
+	}
+	
+	public static void main(String[] args) throws IOException {
+		// TODO Auto-generated method stub
+		a=args[0];
+		b=args[1];
+		c=args[2];
+		define_map(args[1]);
+		utt = new UnitTypeTable();
+		ler();
+
+	}
+
+}

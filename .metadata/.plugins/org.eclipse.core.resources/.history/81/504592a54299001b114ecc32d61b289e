@@ -1,0 +1,94 @@
+package principal;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+
+import ai.synthesis.dslForScriptGenerator.DSLTableGenerator.FunctionsforDSL;
+import ai.synthesis.dslForScriptGenerator.DSLTableGenerator.ParameterDSL;
+import ai.synthesis.grammar.dslTree.CDSL;
+import ai.synthesis.grammar.dslTree.CommandDSL;
+import ai.synthesis.grammar.dslTree.S1DSL;
+import ai.synthesis.grammar.dslTree.S2DSL;
+import ai.synthesis.grammar.dslTree.S3DSL;
+import ai.synthesis.grammar.dslTree.S4DSL;
+import ai.synthesis.grammar.dslTree.builderDSLTree.BuilderDSLTreeSingleton;
+import ai.synthesis.grammar.dslTree.interfacesDSL.iDSL;
+import ai.synthesis.grammar.dslTree.interfacesDSL.iNodeDSLTree;
+import ai.synthesis.twophasessa.TradutorDSL;
+
+public class TESTEgramatica {
+
+	
+	static String QualProducao(iNodeDSLTree node) {
+		
+		if(node instanceof S1DSL) {
+			if(node.getRightChild() instanceof CDSL)return "S1=>0";
+			else if(node.getRightChild() instanceof S2DSL)return "S1=>1";
+			else if(node.getRightChild() instanceof S3DSL)return "S1=>2";		
+			return "S1=>3" ;
+		}
+		if(node instanceof S3DSL) {
+			return "S3=>0";
+		}
+		if(node instanceof S4DSL) {
+			if(node.getLeftChild() instanceof CDSL)return "S4=>0";
+			else if(node.getLeftChild() instanceof S2DSL)return "S4=>1";
+			else return "S4=>2";
+		}
+		if(node instanceof CDSL) {
+			iDSL temp = (iDSL) node;
+			
+			return "C=>"+temp.translate();
+		}
+	
+		
+		return "";
+	}
+	
+	
+	public static void traco( iNodeDSLTree node,List<String> ls,int nivel ) {
+	
+        if (node != null) {
+            iDSL temp = (iDSL) node;
+            
+           // sb.append(temp.getClass().getName() + " " + temp.translate());
+           // sb.append("\n");
+            String prod = QualProducao(node);
+          
+            ls.add(prod);
+            traco( node.getRightNode(),ls,nivel+1);
+            traco( node.getLeftNode(),ls,nivel+1);
+        }
+    }
+	
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		FunctionsforDSL gramatica = new FunctionsforDSL();
+		String s ="for(u) (if(HaveUnitsToDistantToEnemy(Ranged,8,u)) then(moveToUnit(Ranged,Ally,strongest,u) (Z)) attack(Ranged,closest,u) attack(Heavy,closest,u))";
+		TradutorDSL trad = new TradutorDSL(s);
+		iDSL j = trad.getAST();
+		List<String> ls= new ArrayList<>();
+		//BuilderDSLTreeSingleton b = new BuilderDSLTreeSingleton();
+		
+		//BuilderDSLTreeSingleton.formatedStructuredDSLTreePreOrderPrint((iNodeDSLTree)j);
+		//iDSL jj = (iDSL) b.buildS1Grammar();
+		//System.out.println(jj.translate());
+		
+		traco((iNodeDSLTree)j,ls,0);
+		 
+		 Random rand = new Random();
+		
+		for(String p : ls) {
+			System.out.println(p);
+		}
+	        
+	   
+		//gramatica.printFunctions(gramatica.getBasicFunctionsForGrammarUnit());
+		//System.out.println("");
+		//gramatica.printFunctions(gramatica.getBasicFunctionsForGrammar());
+		
+	}
+
+}

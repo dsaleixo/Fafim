@@ -1,0 +1,84 @@
+package CFGBUS;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import CFG.B;
+import CFG.S;
+import util.Pair;
+
+public class BottomUp_Search {
+
+	public BottomUp_Search() {
+		// TODO Auto-generated constructor stub
+	}
+
+	static void init(ProgramList plist) {
+		C_BUS c = new C_BUS();
+		List<S_BUS> l = c.grow();
+		for(S_BUS s : l) {
+			plist.insert(s);
+		}
+		
+		
+		B_BUS b = new B_BUS();
+		List<B> bl = b.AllCombinations();
+		for(B s : bl) {
+			plist.insertB(s);
+		}
+		
+	}
+	
+	static List<Grow> grower(){
+		
+		List<Grow> l = new ArrayList<>();
+		l.add(new For_S_BUS());
+		l.add(new S_S_BUS());
+		l.add(new If_B_then_S_else_S_BUS());
+		l.add(new If_B_then_S_BUS());
+		return l;
+	}
+	
+	static void  grows(ProgramList plist,int size) {
+		
+		
+		List<Grow> grower = BottomUp_Search.grower();
+		List<S_BUS> newList = new ArrayList<>();
+		for(Grow g : grower) {
+			g.grow(plist, size, newList);
+			System.out.println("dd");
+		}
+		
+		for(S_BUS s : newList) {
+			System.out.println(s.translate());
+			plist.insert(s);
+		}
+		
+		
+		
+	}
+
+	
+	
+	static public Pair<S, S> run(){
+		
+		ProgramList plist= new ProgramList();
+		
+		BottomUp_Search.init(plist);
+		
+		
+		
+		BottomUp_Search.grows(plist, 2);
+		System.out.print(plist.get_number_programs());
+		
+		return null;
+	}
+	
+	
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		System.out.println("fdfd");
+		BottomUp_Search.run();
+	}
+
+}

@@ -1,0 +1,37 @@
+package principal;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.List;
+import java.util.Scanner;
+
+import ai.synthesis.grammar.dslTree.interfacesDSL.iDSL;
+
+public class GuerraDosMelhores {
+	List<iDSL> jogadores;
+	List<Double> tempos;
+	
+	public static void ler() throws IOException {
+		BufferedReader buffRead = new BufferedReader(new FileReader("rrr/log_0_0_0.txt"));
+		String linha = "";
+		while (true) {
+			if (linha != null) {
+				System.out.println(linha);
+
+			} else
+				break;
+			linha = buffRead.readLine();
+		}
+		buffRead.close();
+	}
+	
+	
+	
+	public static void main(String[] args) throws IOException {
+		// TODO Auto-generated method stub
+		ler();
+	}
+
+}

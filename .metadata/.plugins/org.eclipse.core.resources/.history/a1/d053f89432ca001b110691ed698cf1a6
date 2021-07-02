@@ -1,0 +1,52 @@
+package CFGBUS;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import CFG.C;
+import CFG.ChildC;
+import CFG.ChildS;
+import CFG.Direction;
+import CFG.OpponentPolicy;
+import CFG.S;
+import CFG.Type;
+import CFG_Actions.Attack;
+import CFG_Actions.Build;
+import CFG_Actions.Harvest;
+import CFG_Actions.Idle;
+import CFG_Actions.MoveAway;
+import CFG_Actions.Train;
+import CFG_Actions.moveToUnit;
+
+public class C_BUS extends C implements NodeBUS  {
+
+	int size;
+	public C_BUS() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public C_BUS(ChildC childC) {
+		super(childC);
+		// TODO Auto-generated constructor stub
+		size =1;
+	}
+
+	
+	 public List<S> grow() {
+		// TODO Auto-generated method stub
+		List<S_BUS> plist = new ArrayList<>();
+		
+		for(C c : this.AllCombinations()) {
+			plist.add(new S_BUS((ChildS) c.Clone()));
+		}
+		
+		return plist;
+	}
+
+	@Override
+	public int getSize() {
+		// TODO Auto-generated method stub
+		return size;
+	}
+
+}

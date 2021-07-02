@@ -1,0 +1,15 @@
+package principal;
+
+import java.util.List;
+
+import ai.synthesis.grammar.dslTree.interfacesDSL.iDSL;
+
+public class GuerraDosMelhores {
+	List<iDSL> jogadores;
+	List<Double> tempos;
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+	}
+
+}

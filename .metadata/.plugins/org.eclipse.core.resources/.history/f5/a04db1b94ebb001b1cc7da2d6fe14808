@@ -1,0 +1,79 @@
+package CLG_David;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import rts.units.Unit;
+
+public class CU implements NodeU,NoTerminal {
+
+	ChildCU childCU;
+	
+	public CU() {
+		// TODO Auto-generated constructor stub
+		childCU =null;
+	}
+
+	
+	
+	
+	public ChildCU getChildCU() {
+		return childCU;
+	}
+
+
+
+
+	public void setChildCU(ChildCU childCU) {
+		this.childCU = childCU;
+	}
+
+
+
+
+	@Override
+	public String transate() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void interpret() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public boolean isComplete() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void interpret(Unit u) {
+		// TODO Auto-generated method stub
+
+	}
+
+	
+	@Override
+	public List<Node> Rules() {
+		// TODO Auto-generated method stub
+		List<Node>  l = new ArrayList<>();
+		
+		
+		l.add(new Empty());
+		
+		
+		return l;
+	}
+
+
+
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return "CU";
+	}
+
+}

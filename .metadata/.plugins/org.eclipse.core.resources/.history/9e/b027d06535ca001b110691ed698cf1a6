@@ -1,0 +1,67 @@
+package CFGBUS;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import CFG.B;
+import CFG.If_B_then_S_else_S;
+import CFG.S;
+import CFG.S_S;
+
+public class S_S_BUS extends S_S implements Grow {
+
+	public S_S_BUS() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public S_S_BUS(S leftS, S rightS) {
+		super(leftS, rightS);
+		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	public void grow(Map<Integer, List<S>> plist, int Size, List<B> blist, List<S> newList) {
+		// TODO Auto-generated method stub
+		
+		List<List<Integer>> combinations = createcombinations(Size);
+		
+		
+		
+		for (List<Integer> c : combinations) {
+			List<S> program_set1 = plist.get(c.get(0));
+           
+			List<S> program_set2 = plist.get(c.get(1));
+	
+	
+			for(S s1 : program_set1) {
+				for(S s2 : program_set2) {
+					S aux = new S(new S_S(s1,s2));
+					newList.add(aux);
+				}
+			}
+		}
+	}
+
+	@Override
+	public List<List<Integer>> createcombinations(int size) {
+		// TODO Auto-generated method stub
+	
+			List<List<Integer>>  l = new ArrayList<>();
+			for(int i =1;i<size;i++) {
+				for(int j=1;j<size;j++) {
+					List<Integer>  l2 = new ArrayList<>();
+					l2.add(i);
+					l2.add(j);
+					
+				}
+			}
+		
+			return l;
+		
+		
+	}
+
+
+
+}

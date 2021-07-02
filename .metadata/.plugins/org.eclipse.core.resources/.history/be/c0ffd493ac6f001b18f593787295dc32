@@ -1,0 +1,1085 @@
+package principal;
+
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+
+import javax.swing.JFrame;
+
+import SetCoverSampling.DataRecollection;
+import SetCoverSampling.GameSampling;
+import SetCoverSampling.RunSampling;
+import Standard.StrategyTactics;
+import ai.RandomBiasedAI;
+import ai.CMAB.A3NWithin;
+import ai.ScriptsGenerator.TableGenerator.FunctionsforGrammar;
+import ai.abstraction.LightRush;
+import ai.abstraction.WorkerRush;
+import ai.abstraction.pathfinding.AStarPathFinding;
+import ai.ahtn.AHTNAI;
+import ai.asymmetric.PGS.LightPGSSCriptChoice;
+import ai.asymmetric.SSS.LightSSSmRTSScriptChoice;
+import ai.competition.dropletGNS.Droplet;
+import ai.configurablescript.BasicExpandedConfigurableScript;
+import ai.configurablescript.ScriptsCreator;
+import ai.core.AI;
+import ai.evaluation.EvaluationFunction;
+import ai.evaluation.SimpleSqrtEvaluationFunction3;
+import ai.puppet.PuppetSearchMCTS;
+import ai.synthesis.DslLeague.Runner.SettingsAlphaDSL;
+import ai.synthesis.dslForScriptGenerator.DslAI;
+import ai.synthesis.dslForScriptGenerator.DSLCommandInterfaces.ICommand;
+import ai.synthesis.dslForScriptGenerator.DSLCompiler.IDSLCompiler;
+import ai.synthesis.dslForScriptGenerator.DSLCompiler.MainDSLCompiler;
+import ai.synthesis.grammar.dslTree.builderDSLTree.BuilderDSLTreeSingleton;
+import ai.synthesis.grammar.dslTree.interfacesDSL.iDSL;
+import ai.synthesis.grammar.dslTree.utils.ReduceDSLController;
+import ai.synthesis.runners.roundRobinLocal.SmartRRGxGRunnable;
+import ga.ScriptTableGenerator.ScriptsTable;
+import ga.config.ConfigurationsGA;
+import ga.model.Chromosome;
+import ga.model.Population;
+import ga.util.PreSelection;
+import ga.util.RunGA;
+import ga.util.RunScriptByState;
+import ga.util.Selection;
+import ga.util.Evaluation.RatePopulation;
+import ga.util.Evaluation.RoundRobinEliteandSampleEval;
+import ga.util.Evaluation.RoundRobinEliteandSampleIterativeEval;
+import ga.util.Evaluation.RoundRobinEval;
+import ga.util.Evaluation.RoundRobinIterativeEval;
+import ga.util.Evaluation.RoundRobinSampleEval;
+import ga.util.Evaluation.SetCoverEval;
+import ga.util.Evaluation.TestSingleMatch;
+import gui.PhysicalGameStatePanel;
+import rts.GameState;
+import rts.PhysicalGameState;
+import rts.PlayerAction;
+import rts.units.Unit;
+import rts.units.UnitType;
+import rts.units.UnitTypeTable;
+import setcoverCalculation.RunSetCoverCalculation;
+import util.TestSingleMatchLeft;
+import util.TestSingleMatchRight;
+import ga.util.Evaluation.DavidEval;
+import ga.util.Evaluation.FixedScriptedEval;
+
+
+public class TestBU {
+	
+	static String curriculumportfolio = "empty";	;
+	static Random rand = new Random();
+	static private List<GameState> states;
+	static UnitTypeTable utt;
+	static List<Chromosome> sIA1;
+	static List<Chromosome> sIA2;
+	static List<List<iDSL>> Camp0;
+	static List<List<iDSL>> Camp1;
+	static List<iDSL> LS0;
+	static List<iDSL> LS1;
+	static ScriptsTable scrTable;
+	private final static String pathTableScripts = System.getProperty("user.dir").concat("/Table/");
+	private final static String pathUsedCommands = System.getProperty("user.dir").concat("/commandsUsed/");
+	private final static String pathLogs = System.getProperty("user.dir").concat("/Tracking/");
+	static String scriptsSetCover="";
+	static HashSet<String> booleansUsed=new HashSet<>();
+	static List<Double> rj0;
+	static List<Double> rj1;
+	static List<Double> eu0;
+	static List<Double> eu1;
+	static List<Double> vl0;
+	static List<Double> vl1;
+	static String path_map = "maps/mapadavid2.xml";
+	static int max_cicle=500;
+	static File arq ;
+	static PrintWriter gravarArq ;
+	static int cont=0;
+	static UnitType workerType;
+	static   UnitType baseType;
+	static    UnitType barracksType;
+	static   UnitType lightType;
+	static  UnitType heavyType;
+	static    UnitType rangedType;
+	
+	public static void imprimir_gs(GameState gs) {
+		int w1 = 0;
+        int br1 = 0;
+        int ba1 = 0;
+        int r1 = 0;
+        int l1 = 0;
+        int h1 = 0;
+        int w2 = 0;
+        int br2 = 0;
+        int ba2 = 0;
+        int r2 = 0;
+        int l2 = 0;
+        int h2 = 0;
+        EvaluationFunction evaluation = new SimpleSqrtEvaluationFunction3();
+        for (Unit u : gs.getUnits()) {
+            if (u.getPlayer() == 0) {
+                if (u.getType() == baseType) {
+                    ba1++;
+                } else if (u.getType() == barracksType) {
+                    br1++;
+                } else if (u.getType() == lightType) {
+                    l1++;
+                } else if (u.getType() == rangedType) {
+                    r1++;
+                } else if (u.getType() == heavyType) {
+                    h1++;
+                } else if (u.getType() == workerType) {
+                    w1++;
+                }
+            }
+
+            if (u.getPlayer() == 1) {
+                if (u.getType() == baseType) {
+                    ba2++;
+                } else if (u.getType() == barracksType) {
+                    br2++;
+                } else if (u.getType() == lightType) {
+                    l2++;
+                } else if (u.getType() == rangedType) {
+                    r2++;
+                } else if (u.getType() == heavyType) {
+                    h2++;
+                } else if (u.getType() == workerType) {
+                    w2++;
+                }
+            }
+        }
+
+        System.out.println("----------------------------------------------------");
+        System.out.println("Player 0 avaliacao = " + evaluation.evaluate(0, 1, gs));
+        System.out.println("		Recurso = " + gs.getPlayer(0).getResources());
+        System.out.println("		Base = " + ba1);
+        System.out.println("		barracks = " + br1);
+        System.out.println("		Worker = " + w1);
+        System.out.println("		Light = " + l1);
+        System.out.println("		Heavy = " + h1);
+        System.out.println("		Ranged = " + r1);
+
+        System.out.println("Player 1 avaliacao = " + evaluation.evaluate(1, 0, gs));
+        System.out.println("		Recurso = " + gs.getPlayer(1).getResources());
+        System.out.println("		Base = " + ba2);
+        System.out.println("		barracks = " + br2);
+        System.out.println("		Worker = " + w2);
+        System.out.println("		Light = " + l2);
+        System.out.println("		Heavy = " + h2);
+        System.out.println("		Ranged = " + r2);
+        
+        gravarArq.println("----------------------------------------------------");
+        gravarArq.println("Player 0 avaliacao = " + evaluation.evaluate(0, 1, gs));
+        gravarArq.println("		Recurso = " + gs.getPlayer(0).getResources());
+        gravarArq.println("		Base = " + ba1);
+        gravarArq.println("		barracks = " + br1);
+        gravarArq.println("		Worker = " + w1);
+        gravarArq.println("		Light = " + l1);
+        gravarArq.println("		Heavy = " + h1);
+        gravarArq.println("		Ranged = " + r1);
+
+        gravarArq.println("Player 1 avaliacao = " + evaluation.evaluate(1, 0, gs));
+        gravarArq.println("		Recurso = " + gs.getPlayer(1).getResources());
+        gravarArq.println("		Base = " + ba2);
+        gravarArq.println("		barracks = " + br2);
+        gravarArq.println("		Worker = " + w2);
+        gravarArq.println("		Light = " + l2);
+        gravarArq.println("		Heavy = " + h2);
+        gravarArq.println("		Ranged = " + r2);
+        
+
+    }
+	
+	
+	public static void define_map(String i) {
+		if(i.equals( "0")) {
+			max_cicle=500;
+			path_map = "maps/mapadavid2.xml";
+		}
+		if(i.equals( "1")) {
+			max_cicle=2500;
+		
+			path_map = "maps/8x8/basesWorkers8x8A.xml";
+		}
+		if(i.equals("2")) {
+			max_cicle=1500;
+			path_map = "maps/NoWhereToRun9x8.xml";
+		}
+		if(i.equals( "3")) {
+			max_cicle=3000;
+			path_map = "maps/24x24/basesWorkers24x24A.xml";
+		}
+	}
+	
+	
+	public static void main(String[] args) throws Exception {
+		// TODO Auto-generated method stub
+		utt = new UnitTypeTable();
+		states = new ArrayList<>();
+		rj0 = new ArrayList<>();
+		rj1 = new ArrayList<>();
+		eu0 = new ArrayList<>();
+		vl1= new ArrayList<>();
+		vl0 = new ArrayList<>();
+		eu1= new ArrayList<>();
+		sIA1 = new ArrayList<>();
+		sIA2 = new ArrayList<>();
+		LS0= new ArrayList<>();
+		LS1= new ArrayList<>();
+		Camp0 = new ArrayList<>();
+		Camp1 = new ArrayList<>();
+		arq = new File("./rrr/log_"+args[0]+"_"+args[1]+".txt");
+		gravarArq = new PrintWriter(arq);
+		gravarArq.println("trtrt");
+		gravarArq.println("trtrt");
+		define_map(args[1]);
+		scrTable = new ScriptsTable(pathTableScripts);
+	     workerType = utt.getUnitType("Worker");
+	      baseType = utt.getUnitType("Base");
+	     barracksType = utt.getUnitType("Barracks");
+	        rangedType = utt.getUnitType("Ranged");
+	        heavyType = utt.getUnitType("Heavy");
+	        lightType = utt.getUnitType("Light");
+		//scrTable = scrTable.generateScriptsTable(ConfigurationsGA.SIZE_TABLE_SCRIPTS);
+		scrTable = scrTable.generateScriptsTableFromSetCover(ConfigurationsGA.SIZE_TABLE_SCRIPTS,scriptsSetCover,booleansUsed,curriculumportfolio);
+		//scrTable = scrTable.generateScriptsTableRecover();
+		scrTable.setCurrentSizeTable(scrTable.getScriptTable().size());
+		
+		
+		AI ai1 =new A3NWithin(100, -1, 100, 8, 0.3F, 0.0F, 0.4F, 0, new RandomBiasedAI(utt),
+				new SimpleSqrtEvaluationFunction3(), true, utt, "ManagerClosestEnemy", 3,
+				decodeScripts(utt, "1;2;3;"), "A3N");
+		
+		AI ai2 =new A3NWithin(100, -1, 100, 8, 0.3F, 0.0F, 0.4F, 0, new RandomBiasedAI(utt),
+				new SimpleSqrtEvaluationFunction3(), true, utt, "ManagerClosestEnemy", 3,
+				decodeScripts(utt, "1;2;3;"), "A3N");
+		
+		
+		 long Tini = System.currentTimeMillis();
+		
+		 
+		 PhysicalGameState pgs = PhysicalGameState.load(path_map, utt);
+			
+				GameState gs = new GameState(pgs, utt);
+			 
+				Busca(gs);
+				
+				LS0 = salva_champs(sIA1);
+				LS1 = salva_champs(sIA2)
+						;
+			
+				LS0 = salva_champs(sIA1);
+				LS1 = salva_champs(sIA2);
+				
+				sIA1.clear();
+				sIA2.clear();
+				
+				rj0.add(-1.0);
+				rj1.add(-1.0);
+				eu0.add(-1.0);
+				eu1.add(-1.0);
+				vl0.add(-1.0);
+				vl1.add(-1.0);
+			
+		GerarPartida(ai1,ai2,path_map,false);
+		filtra(3);
+	
+	    for(int i = 0;i<states.size();i++) {
+	    	System.out.println(i+" de "+states.size()+" gs "+states.get(i).getTime());
+	    	Busca(states.get(i).clone());
+	    	List<iDSL> LS00 = salva_champs(sIA1);
+			List<iDSL> LS11 = salva_champs(sIA2);
+	    	Camp0.add(LS00);
+			Camp1.add(LS11);
+	    	rj0.add(-1.0);
+			rj1.add(-1.0);
+			eu0.add(-1.0);
+			eu1.add(-1.0);
+			vl0.add(-1.0);
+			vl1.add(-1.0);
+	    }
+		
+	
+	    
+	    
+	    
+	 
+	    
+	    long Tfim = System.currentTimeMillis();
+		 double tempo = (Tfim-Tini)*1.0/1000.0;
+		 System.out.println("Tempo  = "+tempo);
+	    
+		 gravarArq.println("LS");
+		 System.out.println("LS");
+		 teste_final(LS0.get(LS0.size()-1),0);
+		 teste_final(LS1.get(LS1.size()-1),1);
+		 /*
+		 System.out.println("Remove 0");
+		 gravarArq.println("Remove 0");
+		 iDSL LSFinal0 = clear_script(LS0.get(LS0.size()-1),LS1,0);
+		 teste_final(LSFinal0,0);
+		 System.out.println("Remove 1");
+		 gravarArq.println("Remove 1");
+		 iDSL LSFinal1 = clear_script(LS1.get(LS1.size()-1),LS0,1);
+		 teste_final(LSFinal1,1);
+		 */
+		 System.out.println("");
+		 System.out.println("");
+		 System.out.println("LSBU");
+		 gravarArq.println("");
+		 gravarArq.println("");
+		 gravarArq.println("LSBU");
+		 List<iDSL> LS00 = Camp0.get(Camp0.size()-1);
+		 List<iDSL> LS11 = Camp1.get(Camp1.size()-1);
+		 teste_final(LS00.get(LS00.size()-1),0);
+		 teste_final(LS11.get(LS11.size()-1),1);
+		 System.out.println("Remove 0");
+		 gravarArq.println("Remove 0");
+		 iDSL LSBUFinal0 = clear_script(LS00.get(LS00.size()-1),LS11,0);
+		 teste_final(LSBUFinal0,0);
+		 System.out.println("Remove 1");
+		 gravarArq.println("Remove 1");
+		 iDSL LSBUFinal1 = clear_script(LS11.get(LS11.size()-1),LS00,1);
+		 teste_final(LSBUFinal1,1);
+		 
+		 
+	    long Tfim1 = System.currentTimeMillis();
+		 double tempo1 = (Tfim1-Tini)*1.0/1000.0;
+		 System.out.println("Tempo  = "+tempo1);
+	    
+		 gravarArq.close();
+		 
+	}
+	
+	static List<iDSL> salva_champs(List<Chromosome> chs){
+		List<iDSL> j = new ArrayList<>();
+		for(Chromosome ch : chs ) {
+			j.add(converte(ch));
+		}
+		
+		return j;
+		
+	}
+	
+	static void imprimiCH(Chromosome ch) {
+		ArrayList<Integer> Genes=(ArrayList<Integer>) ch.getGenes().clone();
+		
+		int bestFinalIndividual=Integer.parseInt(Genes.toString().replace("[", "").replace("]", ""));
+		System.out.println("Final best individual "+bestFinalIndividual);
+		System.out.println("best script "+scrTable.scriptsAST.get(bestFinalIndividual).translate());
+	}
+	
+	static iDSL clear_script(iDSL sujo,List<iDSL> adv,int play) throws Exception {
+		
+		List<Chromosome> ais = new ArrayList<>();
+		for(iDSL id : adv) {
+			ais.add(CriaChromosome(id));
+		}
+		 PhysicalGameState pgs = PhysicalGameState.load(path_map, utt);
+			
+			GameState gs = new GameState(pgs, utt);
+		
+		HashMap<Integer, HashSet<ICommand>> uu=new HashMap<Integer, HashSet<ICommand>>();
+		Chromosome c = CriaChromosome(sujo);
+		double r = Avalia2(gs.clone(),c,ais,play,uu);
+		System.out.println("Avaliacao "+r);
+		 gravarArq.println("Avaliacao "+r);
+		 Population p = Population.getInitialPopulation(convertToInt(convertBasicTuple(c)));
+		 p.addChromosome(c);
+		 for(Chromosome ch :ais) {
+			 p.addChromosome(ch);
+		 }
+		 if(ConfigurationsGA.removeRulesAST )
+			{
+				p=updatePopulationRemotionRules(p,uu);
+				
+			}
+		r = Avalia2(gs.clone(),c,ais,play,uu);
+		System.out.println("Avaliacao de Validacao "+r);
+		gravarArq.println("Avaliacao de Validacao "+r);
+		 
+		 return converte(c);
+	}
+	
+	public static iDSL converte(Chromosome ch) {
+		
+		ArrayList<Integer> Genes=(ArrayList<Integer>) ch.getGenes().clone();
+		
+		int bestFinalIndividual=Integer.parseInt(Genes.toString().replace("[", "").replace("]", ""));
+	
+		return scrTable.scriptsAST.get(bestFinalIndividual);
+		
+	}
+	
+	public static double Avalia(int player, String path_map,boolean exibe) throws Exception {
+		PhysicalGameState pgs = PhysicalGameState.load(path_map, utt);
+	
+		
+		AI ai1 = buildCommandsIA(utt, converte(sIA1.get(sIA1.size()-1)));
+	    AI ai2 = buildCommandsIA(utt, converte(sIA2.get(sIA2.size()-1)));
+	    if(player==1) ai1 = new LightRush(utt);
+	    if(player==0) ai2 = new LightRush(utt);
+		GameState gs2 = new GameState(pgs, utt);
+		boolean gameover = false;
+		JFrame w=null;
+		if(exibe) w = PhysicalGameStatePanel.newVisualizer(gs2,640,640,false,PhysicalGameStatePanel.COLORSCHEME_BLACK);  
+        do {
+      
+                PlayerAction pa1 = ai1.getAction(0, gs2);
+                PlayerAction pa2 = ai2.getAction(1, gs2);
+                gs2.issueSafe(pa1);
+                gs2.issueSafe(pa2);
+             
+                gameover = gs2.cycle();
+                if(exibe) {
+                	w.repaint();
+                	Thread.sleep(100);
+                }
+              
+                
+
+        } while (!gameover && (gs2.getTime() <= max_cicle));   
+		
+		
+		double resultado =0;
+		if(gs2.winner()==player)resultado+=1;
+		if(gs2.winner()==-1)resultado+=0.5;
+		
+		return resultado;
+		
+	
+	}
+	
+	
+	public static void  filtra(int n) {
+		List<GameState> aux=new ArrayList<>();
+		int p=states.size()%n;
+		for(int i =0;i<states.size();i=+p) {
+			aux.add(states.get(i).clone());
+		}
+		states.clear();
+		for(int i = aux.size()-1;i>=0;i--) {
+			states.add(aux.get(i).clone());
+		}
+		
+		
+	}
+
+	
+
+	
+	public static double Avalia2(GameState gs,Chromosome ch,List<Chromosome> ai,int player,HashMap<Integer, HashSet<ICommand>> uniqueCommandsPopulation) throws Exception {
+	
+		
+		double resultado=0;
+		AI ai1 = buildCommandsIA(utt, converte(ch));
+		for(Chromosome ch2 : ai) {
+			
+			int idIA1=convertToInt(convertBasicTuple(ch));
+			int idIA2=convertToInt(convertBasicTuple(ch2));
+			HashSet<ICommand> uniqueCommandsS1 = new HashSet<>();
+			HashSet<ICommand> uniqueCommandsS2 = new HashSet<>();
+			uniqueCommandsPopulation.put(idIA1, uniqueCommandsS1);
+			uniqueCommandsPopulation.put(idIA2, uniqueCommandsS2);
+			
+			
+			List<ICommand> allCommandIA1= new ArrayList<>();;
+		    List<ICommand> allCommandIA2= new ArrayList<>();;
+			
+		    AI ai2 = buildCommandsIA(utt, converte(ch2));
+		    
+			GameState gs2 = gs.clone();
+			boolean gameover = false;
+			 
+	        do {
+	      
+	                PlayerAction pa1 = ai1.getAction(player, gs2);
+	                PlayerAction pa2 = ai2.getAction(1-player, gs2);
+	               
+	                gs2.issueSafe(pa2);
+	                gs2.issueSafe(pa1);
+	                
+	                
+	                gameover = gs2.cycle();
+	                
+	            
+	                
+	
+	        } while (!gameover && (gs2.getTime() <= max_cicle));   
+			
+	        allCommandIA1.clear();
+	        allCommandIA1.addAll(((DslAI) ai1).getCommands());
+	        allCommandIA2.clear();
+	        allCommandIA2.addAll(((DslAI) ai2).getCommands());  
+	        uniqueCommandsPopulation.get(idIA1).addAll(allCommandIA1);
+	        uniqueCommandsPopulation.get(idIA2).addAll(allCommandIA2);
+	        
+			if(gs2.winner()==player)resultado+=1;
+			if(gs2.winner()==-1)resultado+=0.5;
+			
+			
+			
+		}
+		return resultado;
+	}
+	
+	public static int Avalia3(GameState gs,Chromosome ch,Chromosome ch2) throws Exception {
+		
+		
+		double resultado=0;
+		AI ai1 = buildCommandsIA(utt, converte(ch));
+		AI ai2 = buildCommandsIA(utt, converte(ch2));
+		GameState gs2 = gs.clone();
+		boolean gameover = false;
+		do {
+	      
+                PlayerAction pa1 = ai1.getAction(0, gs2);
+                PlayerAction pa2 = ai2.getAction(1, gs2);
+               
+                gs2.issueSafe(pa2);
+                gs2.issueSafe(pa1);
+              
+                gameover = gs2.cycle();
+            
+        } while (!gameover && (gs2.getTime() <= max_cicle));   
+		
+			
+		
+		
+		return gs2.winner();
+	}
+	public static void GerarPartida(AI ai1,AI ai2,String path_map,boolean exibe) throws Exception {
+		PhysicalGameState pgs = PhysicalGameState.load(path_map, utt);
+		ai1.reset();
+		ai2.reset();
+		
+		GameState gs2 = new GameState(pgs, utt);
+		boolean gameover = false;
+		JFrame w=null;
+		if(exibe) w = PhysicalGameStatePanel.newVisualizer(gs2,640,640,false,PhysicalGameStatePanel.COLORSCHEME_BLACK);  
+        do {
+        	if(gs2.getTime()%10==0) {
+        		System.out.println("gerando "+states.size());
+        		states.add(gs2.clone());
+        	}
+                PlayerAction pa1 = ai1.getAction(0, gs2);
+                PlayerAction pa2 = ai2.getAction(1, gs2);
+                gs2.issueSafe(pa1);
+                gs2.issueSafe(pa2);
+             
+                gameover = gs2.cycle();
+                if(exibe) {
+                	w.repaint();
+                	Thread.sleep(1);
+                }
+                
+                
+
+        } while (!gameover && (gs2.getTime() <= max_cicle));   
+		System.out.println("gerou "+states.size());
+		
+
+	}
+	
+	public static double Avalia4(AI ai1,AI ai2,int play,String path_map,boolean exibe) throws Exception {
+		PhysicalGameState pgs = PhysicalGameState.load(path_map, utt);
+		ai1.reset();
+		//ai2.reset();
+		
+		GameState gs2 = new GameState(pgs, utt);
+		boolean gameover = false;
+		JFrame w=null;
+		if(exibe) w = PhysicalGameStatePanel.newVisualizer(gs2,640,640,false,PhysicalGameStatePanel.COLORSCHEME_BLACK);  
+        do {
+        		;
+                PlayerAction pa1 = ai1.getAction(play, gs2);
+                PlayerAction pa2 = ai2.getAction(1-play, gs2);
+                gs2.issueSafe(pa1);
+                gs2.issueSafe(pa2);
+             
+                gameover = gs2.cycle();
+                if(exibe) {
+                	w.repaint();
+                	Thread.sleep(1);
+                }
+                
+                
+
+        } while (!gameover && (gs2.getTime() <= max_cicle));   
+		
+		double r = 0;
+		if(gs2.winner()==play)r=1;
+		else if (gs2.winner()==-1)r=0.5;
+
+		return r;
+	}
+	
+	
+	public static void ShowStates() {
+		System.out.println("ssss");
+
+		for (int i =0;i<states.size();i++) {
+			JFrame w = PhysicalGameStatePanel.newVisualizer(states.get(i),640,640,false,PhysicalGameStatePanel.COLORSCHEME_BLACK); 
+		}
+	}
+	
+	
+	public static int verifyIfExistsIndividualInTable(ArrayList<iDSL> scriptsAST, String candidate)
+	{
+		for(int i=0;i< scriptsAST.size();i++)
+		{
+			if(scriptsAST.get(i).translate().equals(candidate))
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	
+	
+	public static Chromosome CriaChromosome(iDSL a1) {
+		String newScript=a1.translate();
+		int idCandidate=verifyIfExistsIndividualInTable(scrTable.scriptsAST,newScript);
+		int idNewScript;
+		if(idCandidate!=-1)
+		{
+			idNewScript=idCandidate;			
+		}
+		else
+		{	
+			scrTable.scriptsAST.add(a1);
+			idNewScript=scrTable.scriptsAST.size()-1;
+			
+		}
+		
+		Chromosome tChom = new Chromosome();
+		tChom.addGene(idNewScript);
+		return tChom;
+		
+	}
+	
+	
+	public static Chromosome getMelhor(GameState gs,Population p,List<Chromosome> ais,int play,HashMap<Integer, HashSet<ICommand>> uniqueCommandsPopulation) throws Exception {
+		HashMap<Integer, HashSet<ICommand>> uu=new HashMap<Integer, HashSet<ICommand>>();
+		Chromosome ch=null; 
+		double melhor =-1;
+		
+	
+		for (Chromosome  c : p.getChromosomes().keySet()) {
+			double r = Avalia2(gs,c,ais,play,uniqueCommandsPopulation);
+			updatePopulationASTs(p,c,r);
+			if (r>melhor) {
+				melhor=r;
+				ch = c;
+			}
+		}
+
+		p.clearValueChromosomes();
+		
+		
+		
+		updatePopulationASTs(p,ch,melhor);
+		return ch;
+	}
+	private static Population updatePopulationRemotionRules(Population population, HashMap<Integer, HashSet<ICommand>> uniqueCommandsPopulation)
+	{
+		for (Chromosome ch : population.getChromosomes().keySet()) {
+			int idScript=Integer.parseInt(convertBasicTuple(ch).replace(";", ""));
+			BigDecimal toUpdate = population.getChromosomes().get(ch);
+			iDSL originalScript=(iDSL) scrTable.scriptsAST.get(idScript);
+			String originalScriptStr=originalScript.translate();
+			ReduceDSLController.removeUnactivatedParts(originalScript, new ArrayList<>(uniqueCommandsPopulation.get(idScript)));
+			//updateReferencesforScript(originalScriptStr,originalScript.translate(),idScript);
+			//population=addToPopulation(newScript,population,toUpdate);
+		}
+		return population;
+		
+	}
+	
+	public static Population updatePopulationASTs(Population population,Chromosome chrUpdate, double value) {
+		BigDecimal b = new BigDecimal(value);
+	
+		if (chrUpdate != null) {
+			BigDecimal toUpdate = population.getChromosomes().get(chrUpdate);
+			if (toUpdate != null) {
+				toUpdate = toUpdate.add(b);
+				HashMap<Chromosome, BigDecimal> chrTemp = population.getChromosomes();
+				chrTemp.put(chrUpdate, toUpdate);
+			}
+		}
+		
+		return population;
+	}
+	
+	
+	
+	
+	private static int convertToInt(String script) {
+
+		ArrayList<Integer> iScriptsAi1 = new ArrayList<>();
+		String[] itens = script.replace("(", "").replace(")", "").split(";");
+
+		for (String element : itens) {
+			iScriptsAi1.add(Integer.decode(element));
+		}
+
+		return iScriptsAi1.get(0);
+	}
+
+	
+	private static String convertBasicTuple(Chromosome cromo) {
+		String tuple = "";
+
+		for (Integer integer : cromo.getGenes()) {
+			tuple += integer + ";";
+		}
+
+		return tuple;
+	}
+	
+	
+	public static List<String> chrs_string(Population p){
+		List<String> s = new ArrayList<>();
+		for(Chromosome ch :p.getChromosomes().keySet()) {
+			s.add(converte(ch).translate());
+		}
+		return s;
+	}
+	public static List<String> chrs1_string(List<Chromosome>  p){
+		List<String> s = new ArrayList<>();
+		for(Chromosome ch : p) {
+			s.add(converte(ch).translate());
+		}
+		return s;
+	}
+	
+	public static void salva_erro(List<String> j0,List<String> j1,List<String> p0,List<String> p1) {
+		gravarArq.println("Instancia "+cont);
+		gravarArq.println("		jogador0");
+		for(String s : j0) {
+			gravarArq.println("			"+s);
+		}
+		gravarArq.println("		jogador1");
+		for(String s : j1) {
+			gravarArq.println("			"+s);
+		}
+		gravarArq.println("		populacao0");
+		for(String s : p0) {
+			gravarArq.println("			"+s);
+		}
+		gravarArq.println("		populacao1");
+		for(String s : p1) {
+			gravarArq.println("			"+s);
+		}
+		gravarArq.println("		xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+		List<String> nj1 = chrs1_string(sIA2);
+		List<String> nj0  = chrs1_string(sIA1);
+		gravarArq.println("		novo jogador0");
+		for(String s : nj0) {
+			gravarArq.println("			"+s);
+		}
+		gravarArq.println("		novo jogador1");
+		for(String s : nj1) {
+			gravarArq.println("			"+s);
+		}
+		
+		cont+=1;
+	}
+	
+	public static void Busca(GameState gs) throws Exception {
+		
+		if(sIA1.size()==0) {
+			iDSL a1=(iDSL) scrTable.scriptsAST.get(rand.nextInt(scrTable.scriptsAST.size())).clone();
+		 	a1=BuilderDSLTreeSingleton.changeNeighbourPassively(a1,scrTable.allBasicFunctionsRedefined,scrTable.allBooleansFunctionsRedefined);
+		 	scrTable.scriptsAST.add(a1);
+		 	sIA1.add(CriaChromosome(a1));
+		 	
+		}
+		if(sIA2.size()==0) {
+			iDSL a2=(iDSL) scrTable.scriptsAST.get(rand.nextInt(scrTable.scriptsAST.size())).clone();
+			a2=BuilderDSLTreeSingleton.changeNeighbourPassively(a2,scrTable.allBasicFunctionsRedefined,scrTable.allBooleansFunctionsRedefined);
+			scrTable.scriptsAST.add(a2);
+			sIA2.add(CriaChromosome(a2));
+		}
+		
+		
+		PrintWriter f0;
+	
+			f0 = new PrintWriter(new FileWriter(pathLogs+"Tracking.txt"));
+		
+			Chromosome tChom1=sIA1.get(sIA1.size()-1);
+			Chromosome tChom2=sIA2.get(sIA2.size()-1);
+			
+			Population p1 = Population.getInitialPopulation(convertToInt(convertBasicTuple(tChom1)));
+			Population p2 = Population.getInitialPopulation(convertToInt(convertBasicTuple(tChom2)));
+		int atualiza = 0;
+		int oo =0;
+		
+		while(atualiza<10&&oo<50) {
+			oo++;
+			HashMap<Integer, HashSet<ICommand>> uu=new HashMap<Integer, HashSet<ICommand>>();
+			
+			
+			System.out.println("fsdfdf "+atualiza+" time = "+ gs.getTime());
+		
+			
+			
+	
+			//Get all the used commands
+			if(ConfigurationsGA.removeRules==true) {
+				p1.fillAllCommands(pathTableScripts);
+				p1.chooseusedCommands(pathUsedCommands);
+				p1.removeCommands(scrTable,pathTableScripts);
+				p2.fillAllCommands(pathTableScripts);
+				p2.chooseusedCommands(pathUsedCommands);
+				p2.removeCommands(scrTable,pathTableScripts);
+			}
+	
+			//p1.printWithValue(f0);
+			//p2.printWithValue(f0);
+			
+			
+			
+			
+			
+			Chromosome ch1 =null;
+			Chromosome ch2 =null;
+			boolean win_in_tie1 = false;
+			boolean win_in_tie2 = false;
+			
+			;
+			Selection selecao1 = new Selection();
+			p1 = selecao1.applySelectionAST(p1, scrTable, pathTableScripts,pathTableScripts);
+			Selection selecao2 = new Selection();
+			p2 = selecao2.applySelectionAST(p2, scrTable, pathTableScripts,pathTableScripts);
+			
+			
+			
+			
+			
+			
+			HashMap<Integer, HashSet<ICommand>> uniqueCommandsPopulation =new HashMap<Integer, HashSet<ICommand>>();
+			eu1.add( Avalia2(gs,sIA2.get(sIA2.size()-1),sIA1,1,uu));
+			eu0.add( Avalia2(gs,sIA1.get(sIA1.size()-1),sIA2,0,uu));
+			Chromosome chh1 = getMelhor(gs,p1,sIA2,0,uniqueCommandsPopulation);
+			Chromosome chh2 =getMelhor(gs,p2,sIA1,1,uniqueCommandsPopulation);
+			
+			
+			if(ConfigurationsGA.removeRulesAST && false)
+			{
+				p1=updatePopulationRemotionRules(p1,uniqueCommandsPopulation);
+				p2=updatePopulationRemotionRules(p2,uniqueCommandsPopulation);
+			}
+			
+			vl1.add( Avalia2(gs,sIA2.get(sIA2.size()-1),sIA1,1,uu));
+			vl0.add( Avalia2(gs,sIA1.get(sIA1.size()-1),sIA2,0,uu));
+			
+			int n1=vl0.size();
+			if(!vl0.get(n1-1).equals(eu0.get(n1-1))||!vl1.get(n1-1).equals(eu1.get(n1-1))) {
+				System.out.println("v0 = "+vl0.get(n1-1)+"e0 = "+eu0.get(n1-1)+"v1 = "+vl1.get(n1-1)+"e1 = "+eu1.get(n1-1));
+				//salva_erro(fj0,fj1,fp0,fp1);
+				
+			}
+			for (Chromosome ch :selecao1.eliteIndividuals.keySet()){
+				double r = Avalia2(gs,sIA1.get(sIA1.size()-1),sIA2,0,uu);
+				
+				double r2= Avalia2(gs,chh1,sIA2,0,uu);
+				double v= Avalia2(gs,ch,sIA2,0,uu);
+				System.out.println( "valida = "+v+" atual = "+r +" r2 ="+r2+" n = "+sIA2.size());
+				if(r2>r )ch1=chh1;
+				
+			}
+			
+			
+			
+			
+			for (Chromosome ch :selecao2.eliteIndividuals.keySet()){
+				double r = Avalia2(gs,sIA2.get(sIA2.size()-1),sIA1,1,uu);
+				
+				double r2=Avalia2(gs,chh2,sIA1,1,uu);
+				double v= Avalia2(gs,ch,sIA1,1,uu);
+				System.out.println( "valida = "+v+" atual = "+r +" r2 ="+r2+" n = "+sIA1.size());
+				if(r2>r)ch2=chh2;
+				
+			}
+			
+			
+			
+			if(ch2 !=null) {
+				 if(AtualizaFicticious(sIA2,ch2))atualiza=0;
+				
+			}
+			
+			if(ch1 !=null) {
+				 if(AtualizaFicticious(sIA1,ch1))atualiza=0;
+			
+			}
+			
+			
+			if(win_in_tie2 || win_in_tie1)atualiza-=0;
+			
+			
+			atualiza+=1;
+			
+			
+			
+			rj0.add(Avalia(0,path_map,false));
+			rj1.add(Avalia(1,path_map,false));
+			System.out.println("script0 = "+converte(sIA1.get(sIA1.size()-1)).translate());
+			System.out.println("script1 = "+converte(sIA2.get(sIA2.size()-1)).translate());
+			System.out.println("rj0 "+rj0);
+			System.out.println("rj1 "+rj1);
+			System.out.println("eu0 "+eu0);
+			
+			System.out.println("vl0 "+vl0);
+			System.out.println("vl1 "+vl1);
+			System.out.println("eu1 "+eu1);
+			//emprestimo(gs,sIA1,sIA2,0);
+			//emprestimo(gs,sIA2,sIA1,1);
+			System.out.println("fsdfdf2 "+atualiza+" time = "+ gs.getTime());
+		}
+		f0.close();
+		
+	}
+	
+	public static void teste_final(iDSL ch,int play) throws Exception {
+		AI ai1 = buildCommandsIA(utt, ch);
+		
+		AI ai2 =new A3NWithin(100, -1, 100, 8, 0.3F, 0.0F, 0.4F, 0, new RandomBiasedAI(utt),
+				new SimpleSqrtEvaluationFunction3(), true, utt, "ManagerClosestEnemy", 3,
+				decodeScripts(utt, "1;2;3;"), "A3N");
+		double r=0;
+		gravarArq.println("Resultado "+play);
+		gravarArq.println("Script "+ch.translate());
+		
+		System.out.println("Resultado "+play);
+		System.out.println("Script "+ch.translate());
+		for(int i =0;i<10;i++) {
+			ai2 =new A3NWithin(100, -1, 100, 8, 0.3F, 0.0F, 0.4F, 0, new RandomBiasedAI(utt),
+					new SimpleSqrtEvaluationFunction3(), true, utt, "ManagerClosestEnemy", 3,
+					decodeScripts(utt, "1;2;3;"), "A3N");
+			r+=Avalia4(ai1,ai2,play,path_map,false);
+		}
+		gravarArq.println("    A3N =" + r);
+		System.out.println("    A3N =" + r);
+		r=0;
+		ai2=new LightRush(utt);
+		for(int i =0;i<10;i++) {
+			r+=Avalia4(ai1,ai2,play,path_map,false);
+		}
+		gravarArq.println("    LR =" + r);
+		System.out.println("    LR =" + r);
+		r=0;
+		ai2=new WorkerRush(utt);
+		for(int i =0;i<10;i++) {
+			r+=Avalia4(ai1,ai2,play,path_map,false);
+		}
+		gravarArq.println("    WR =" + r);
+		System.out.println("    WR =" + r);
+		
+		
+	}
+	
+	
+	public static void emprestimo(GameState gs,List<Chromosome> pobre, List<Chromosome> rica,int play) throws Exception{
+		HashMap<Integer, HashSet<ICommand>> uu=new HashMap<Integer, HashSet<ICommand>>();
+		double r1 = Avalia2(gs, pobre.get(pobre.size()-1), rica, play, uu) ;
+		double r2 = Avalia2(gs, rica.get(rica.size()-1), rica, play, uu) ;
+		
+		if(r2>r1) {
+			pobre.remove(0);
+			pobre.add(rica.get(rica.size()-1));
+		}
+		
+	}; 
+	
+	public static boolean empate(Chromosome desafiante, Chromosome campeao, GameState gs2) throws Exception {
+		
+		double r=0;
+		int r1 = Avalia3(gs2,desafiante, campeao);
+		if(r1==0)r+=1;
+		if(r1==-1)r+=0.5;
+		r1 = Avalia3(gs2,campeao,desafiante);
+		if(r1==1)r+=1;
+		if(r1==-1)r+=0.5;
+		
+		if(r<1)return false;
+		if(r>1)return true;
+		
+		Random aleatorio = new Random();
+		int sorte = aleatorio.nextInt(4);
+		
+		if(sorte==0)return true;
+		else return false;
+		
+		
+	}
+	
+	
+	public static boolean AtualizaFicticious(List<Chromosome> ai,Chromosome ch) {
+		
+		int idIA1=convertToInt(convertBasicTuple(ch));
+		
+		for(Chromosome c : ai) {
+			int idIA2=convertToInt(convertBasicTuple(c));
+			if(idIA1==idIA2)return false;
+		}
+		
+		
+		if(ai.size()>10)ai.remove(0);
+		
+		
+		ai.add(ch);
+		return true;
+	}
+	
+	public static List<AI> decodeScripts(UnitTypeTable utt, String sScripts) {
+
+		//decompõe a tupla
+		ArrayList<Integer> iScriptsAi1 = new ArrayList<>();
+		String[] itens = sScripts.split(";");
+
+		for (String element : itens) {
+			iScriptsAi1.add(Integer.decode(element));
+		}
+
+		List<AI> scriptsAI = new ArrayList<>();
+
+		ScriptsCreator sc = new ScriptsCreator(utt, 300);
+		ArrayList<BasicExpandedConfigurableScript> scriptsCompleteSet = sc.getScriptsMixReducedSet();
+
+		iScriptsAi1.forEach((idSc) -> {
+			scriptsAI.add(scriptsCompleteSet.get(idSc));
+		});
+
+		return scriptsAI;
+	}
+
+
+	private static AI buildCommandsIA(UnitTypeTable utt, iDSL code) {
+		IDSLCompiler compiler = new MainDSLCompiler();   
+        HashMap<Long, String> counterByFunction = new HashMap<Long, String>();
+        List<ICommand> commandsDSL = compiler.CompilerCode(code, utt);
+        AI aiscript = new DslAI(utt, commandsDSL, "P1", code, counterByFunction);
+        return aiscript;
+    }
+	
+
+}

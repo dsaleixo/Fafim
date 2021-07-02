@@ -1,0 +1,39 @@
+package CFGBUS;
+
+import java.util.List;
+
+import CFG.B;
+import CFG.S;
+import util.Pair;
+
+public class BottomUp_Search {
+
+	public BottomUp_Search() {
+		// TODO Auto-generated constructor stub
+	}
+
+	void init(ProgramList plist) {
+		C_BUS c = new C_BUS();
+		List<S_BUS> l = c.grow();
+		for(S_BUS s : l) {
+			plist.insert(s);
+		}
+		
+		
+		B_BUS b = new B_BUS();
+		List<B> bl = b.AllCombinations();
+	}
+	
+	
+	public Pair<S, S> run(){
+		
+		return null;
+	}
+	
+	
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+	}
+
+}

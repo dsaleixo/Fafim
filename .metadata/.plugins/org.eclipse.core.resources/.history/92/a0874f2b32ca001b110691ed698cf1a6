@@ -1,0 +1,7 @@
+package CFGBUS;
+
+import CFG.Node;
+
+public interface NodeProbe extends Node {
+	public int getSize();
+}
